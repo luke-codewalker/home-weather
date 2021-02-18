@@ -8,15 +8,21 @@ services:
     ports:
       - 3000:3000
     depends_on: 
-      - mongo-db
+      - postgres
 
-  mongo-db:
-    image: mongo
-    ports: 
-      - '27017:27017'
+  postgres:
+    container_name: postgres_db
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_DB=postgresdb
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
-      - mongodata:/data/db
+      - psql-data:/var/lib/postgresql/data
 
 volumes:
-  mongodata:
+  psql-data:
     external: true
