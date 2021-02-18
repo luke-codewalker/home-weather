@@ -7,3 +7,16 @@ services:
       - PORT=3000
     ports:
       - 3000:3000
+    depends_on: 
+      - mongo-db
+
+  mongo-db:
+    image: mongo
+    ports: 
+      - '27017:27017'
+    volumes:
+      - mongodata:/data/db
+
+volumes:
+  mongodata:
+    external: true
