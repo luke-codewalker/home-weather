@@ -1,16 +1,44 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query } from '@nestjs/common';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { type } from 'os';
 import { CreateWeatherDto, WeatherDto } from './models/weather.dto';
-import { WeatherService } from './weather.service';
+import { WeatherFilters, WeatherService } from './weather.service';
 
 @ApiTags('Weather')
 @Controller('weather')
 export class WeatherController {
     constructor(private readonly weatherService: WeatherService) { }
 
+    @ApiQuery({
+        name: 'since',
+        required: false,
+    })
+    @ApiQuery({
+        name: 'minTemperature',
+        required: false,
+    })
+    @ApiQuery({
+        name: 'maxTemperature',
+        required: false,
+    })
     @Get()
-    async getAllWeatherData() {
-        return this.weatherService.getAllWeatherData();
+    async getAllWeatherData(
+        @Query('since') sinceFilter: Date,
+        @Query(encodeURIComponent('minTemperature')) minTemperature: number,
+        @Query(encodeURIComponent('maxTemperature')) maxTemperature: number,
+    ) {
+
+        const filters: WeatherFilters = {};
+        if (!isNaN(sinceFilter.getTime())) {
+            filters.since = new Date(sinceFilter);
+        }
+        if (!isNaN(minTemperature)) {
+            filters.minTemperature = minTemperature;
+        }
+        if (!isNaN(maxTemperature)) {
+            filters.maxTemperature = maxTemperature;
+        }
+        return this.weatherService.getAllWeatherData(filters);
     }
 
     @Get(':id')

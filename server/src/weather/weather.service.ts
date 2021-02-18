@@ -4,12 +4,39 @@ import { Weather, WeatherDocument } from "./models/weather.model";
 import { Model } from 'mongoose';
 import { CreateWeatherDto, WeatherDto } from "./models/weather.dto";
 
+export type WeatherFilters = {
+    since?: Date,
+    minTemperature?: number,
+    maxTemperature?: number
+}
+
 @Injectable()
 export class WeatherService {
     constructor(@InjectModel(Weather.name) private weatherModel: Model<WeatherDocument>) { }
 
-    async getAllWeatherData(): Promise<WeatherDto[]> {
-        const allWeatherData = await this.weatherModel.find().exec();
+    async getAllWeatherData(filters: WeatherFilters): Promise<WeatherDto[]> {
+        const query = {};
+        if (filters.since) {
+            query['createdAt'] = {
+                '$gte': filters.since
+            }
+        }
+
+        if (typeof filters.minTemperature !== 'undefined') {
+            query['temperature'] = {
+                '$gte': filters.minTemperature
+            }
+        }
+
+        if (typeof filters.maxTemperature !== 'undefined') {
+            query['temperature'] = {
+                ...query['temperature'],
+                '$lte': filters.maxTemperature
+            }
+        }
+        console.log(filters, query);
+
+        const allWeatherData = await this.weatherModel.find(query).exec();
         return allWeatherData.map(p => new WeatherDto(p));
     }
 
