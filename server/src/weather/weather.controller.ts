@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, 
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { type } from 'os';
 import { CreateWeatherDto, WeatherDto } from './models/weather.dto';
-import { WeatherFilters, WeatherService } from './weather.service';
+import { SortOption, WeatherFilters, WeatherService } from './weather.service';
 
 @ApiTags('Weather')
 @Controller('weather')
@@ -21,13 +21,17 @@ export class WeatherController {
         name: 'maxTemperature',
         required: false,
     })
+    @ApiQuery({
+        name: 'sortByDate',
+        required: false,
+    })
     @Get()
     async getAllWeatherData(
         @Query('since') sinceFilter: Date,
-        @Query(encodeURIComponent('minTemperature')) minTemperature: number,
-        @Query(encodeURIComponent('maxTemperature')) maxTemperature: number,
+        @Query('minTemperature') minTemperature: number,
+        @Query('maxTemperature') maxTemperature: number,
+        @Query('sortByDate') sortByDate: SortOption,
     ) {
-
         const filters: WeatherFilters = {};
         if (!isNaN(sinceFilter.getTime())) {
             filters.since = new Date(sinceFilter);
@@ -38,7 +42,8 @@ export class WeatherController {
         if (!isNaN(maxTemperature)) {
             filters.maxTemperature = maxTemperature;
         }
-        return this.weatherService.getAllWeatherData(filters);
+
+        return this.weatherService.getAllWeatherData(filters, sortByDate);
     }
 
     @Get(':id')

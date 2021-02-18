@@ -10,11 +10,13 @@ export type WeatherFilters = {
     maxTemperature?: number
 }
 
+export type SortOption = 'ascending' | 'descending';
+
 @Injectable()
 export class WeatherService {
     constructor(@InjectModel(Weather.name) private weatherModel: Model<WeatherDocument>) { }
 
-    async getAllWeatherData(filters: WeatherFilters): Promise<WeatherDto[]> {
+    async getAllWeatherData(filters: WeatherFilters, sortByDate: SortOption = 'ascending'): Promise<WeatherDto[]> {
         const query = {};
         if (filters.since) {
             query['createdAt'] = {
@@ -34,9 +36,12 @@ export class WeatherService {
                 '$lte': filters.maxTemperature
             }
         }
-        console.log(filters, query);
 
-        const allWeatherData = await this.weatherModel.find(query).exec();
+        const sortOptions = {
+            createdAt: (sortByDate !== 'ascending' && sortByDate !== 'descending') ? 'ascending' : sortByDate
+        }
+
+        const allWeatherData = await this.weatherModel.find(query).sort(sortOptions).exec();
         return allWeatherData.map(p => new WeatherDto(p));
     }
 
