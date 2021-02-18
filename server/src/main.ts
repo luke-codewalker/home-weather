@@ -1,8 +1,28 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { apiInfo } from './models/api-info.dto';
+import * as helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+  app.use(helmet());
+
+  app.useGlobalPipes(new ValidationPipe());
+  app.setGlobalPrefix('api')
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle(apiInfo.title)
+    .setDescription(apiInfo.description)
+    .setVersion(apiInfo.version)
+    .build();
+
+  const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, swaggerDoc);
+
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
+  console.log(`Home Weather Backend started on http://localhost:${port}`);
 }
 bootstrap();
