@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { type } from 'os';
 import { CreateWeatherDto, WeatherDto } from './models/weather.dto';
 import { SortOption, WeatherFilters, WeatherService } from './weather.service';
 
@@ -32,18 +31,19 @@ export class WeatherController {
         @Query('maxTemperature') maxTemperature: number,
         @Query('sortByDate') sortByDate: SortOption,
     ) {
-        const filters: WeatherFilters = {};
-        if (!isNaN(sinceFilter.getTime())) {
-            filters.since = new Date(sinceFilter);
-        }
-        if (!isNaN(minTemperature)) {
-            filters.minTemperature = minTemperature;
-        }
-        if (!isNaN(maxTemperature)) {
-            filters.maxTemperature = maxTemperature;
-        }
+        // const filters: WeatherFilters = {};
+        // if (!isNaN(sinceFilter.getTime())) {
+        //     filters.since = new Date(sinceFilter);
+        // }
+        // if (!isNaN(minTemperature)) {
+        //     filters.minTemperature = minTemperature;
+        // }
+        // if (!isNaN(maxTemperature)) {
+        //     filters.maxTemperature = maxTemperature;
+        // }
 
-        return this.weatherService.getAllWeatherData(filters, sortByDate);
+        // return this.weatherService.getAllWeatherData(filters, sortByDate);
+        return this.weatherService.getAllWeatherData();
     }
 
     @Get(':id')
@@ -74,10 +74,9 @@ export class WeatherController {
     }
 
     @Delete(':id')
-    async deleteWeatherById(@Param('id') id: string) {
-        let deletedWeather: WeatherDto;
+    async deleteWeatherById(@Param('id') id: string): Promise<void> {
         try {
-            deletedWeather = await this.weatherService.deleteWeatherById(id);
+            await this.weatherService.deleteWeatherById(id);
         } catch (error) {
             throw new HttpException({
                 status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -85,13 +84,5 @@ export class WeatherController {
             }, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        if (!deletedWeather) {
-            throw new HttpException({
-                status: HttpStatus.NOT_FOUND,
-                message: `No weather data found for ${id}`
-            }, HttpStatus.NOT_FOUND);
-        } else {
-            return deletedWeather;
-        }
     }
 }

@@ -1,8 +1,8 @@
 import { IsNumber } from "class-validator";
-import { WeatherDocument } from "./weather.model";
+import { WeatherEntity } from "./weather.entity";
 
 export class WeatherDto {
-    constructor(weather: WeatherDocument) {
+    constructor(weather: WeatherEntity) {
         this.id = weather.id;
         this.temperature = weather.temperature;
         this.pressure = weather.pressure;

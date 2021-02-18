@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
-import { Weather, WeatherSchema } from './weather/models/weather.model';
+import { WeatherEntity } from './weather/models/weather.entity';
 import { WeatherController } from './weather/weather.controller';
 import { WeatherService } from './weather/weather.service';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://mongo-db/natl', { useFindAndModify: false }),
-    MongooseModule.forFeature([{ name: Weather.name, schema: WeatherSchema }])
+    TypeOrmModule.forRoot(),
+    TypeOrmModule.forFeature([WeatherEntity])
   ],
   controllers: [AppController, WeatherController],
   providers: [WeatherService],

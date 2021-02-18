@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Weather, WeatherDocument } from "./models/weather.model";
-import { Model } from 'mongoose';
+import { WeatherEntity } from "./models/weather.entity";
 import { CreateWeatherDto, WeatherDto } from "./models/weather.dto";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
 export type WeatherFilters = {
     since?: Date,
@@ -14,47 +14,48 @@ export type SortOption = 'ascending' | 'descending';
 
 @Injectable()
 export class WeatherService {
-    constructor(@InjectModel(Weather.name) private weatherModel: Model<WeatherDocument>) { }
+    constructor(@InjectRepository(WeatherEntity) private weatherRepository: Repository<WeatherEntity>) { }
 
-    async getAllWeatherData(filters: WeatherFilters, sortByDate: SortOption = 'ascending'): Promise<WeatherDto[]> {
-        const query = {};
-        if (filters.since) {
-            query['createdAt'] = {
-                '$gte': filters.since
-            }
-        }
+    // async getAllWeatherData(filters: WeatherFilters, sortByDate: SortOption = 'ascending'): Promise<WeatherDto[]> {
+    // const query = {};
+    // if (filters.since) {
+    //     query['createdAt'] = {
+    //         '$gte': filters.since
+    //     }
+    // }
 
-        if (typeof filters.minTemperature !== 'undefined') {
-            query['temperature'] = {
-                '$gte': filters.minTemperature
-            }
-        }
+    // if (typeof filters.minTemperature !== 'undefined') {
+    //     query['temperature'] = {
+    //         '$gte': filters.minTemperature
+    //     }
+    // }
 
-        if (typeof filters.maxTemperature !== 'undefined') {
-            query['temperature'] = {
-                ...query['temperature'],
-                '$lte': filters.maxTemperature
-            }
-        }
+    // if (typeof filters.maxTemperature !== 'undefined') {
+    //     query['temperature'] = {
+    //         ...query['temperature'],
+    //         '$lte': filters.maxTemperature
+    //     }
+    // }
 
-        const sortOptions = {
-            createdAt: (sortByDate !== 'ascending' && sortByDate !== 'descending') ? 'ascending' : sortByDate
-        }
-
-        const allWeatherData = await this.weatherModel.find(query).sort(sortOptions).exec();
+    // const sortOptions = {
+    //     createdAt: (sortByDate !== 'ascending' && sortByDate !== 'descending') ? 'ascending' : sortByDate
+    // }
+    // const allWeatherData = await this.weatherModel.find(query).sort(sortOptions).exec();
+    //     return allWeatherData.map(p => new WeatherDto(p));
+    async getAllWeatherData(): Promise<WeatherDto[]> {
+        const allWeatherData = await this.weatherRepository.find();
         return allWeatherData.map(p => new WeatherDto(p));
     }
 
     async createNewWeather(weatherData: CreateWeatherDto) {
-        const newWeather = new this.weatherModel(weatherData);
-        const savedWeather = await newWeather.save();
+        const savedWeather = await this.weatherRepository.save(weatherData);
         return new WeatherDto(savedWeather);
     }
 
     async getWeatherByID(id: string) {
         let weather = null;
         try {
-            weather = await this.weatherModel.findById(id);
+            weather = await this.weatherRepository.findOne(id);
         } catch (error) {
             throw error;
         }
@@ -62,12 +63,10 @@ export class WeatherService {
     }
 
     async deleteWeatherById(id: string) {
-        let deletedWeather = null;
         try {
-            deletedWeather = await this.weatherModel.findByIdAndDelete(id);
+            await this.weatherRepository.delete(id);
         } catch (error) {
             throw error;
         }
-        return deletedWeather ? new WeatherDto(deletedWeather) : null;
     }
 }
