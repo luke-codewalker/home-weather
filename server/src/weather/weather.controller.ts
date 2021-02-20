@@ -31,19 +31,18 @@ export class WeatherController {
         @Query('maxTemperature') maxTemperature: number,
         @Query('sortByDate') sortByDate: SortOption,
     ) {
-        // const filters: WeatherFilters = {};
-        // if (!isNaN(sinceFilter.getTime())) {
-        //     filters.since = new Date(sinceFilter);
-        // }
-        // if (!isNaN(minTemperature)) {
-        //     filters.minTemperature = minTemperature;
-        // }
-        // if (!isNaN(maxTemperature)) {
-        //     filters.maxTemperature = maxTemperature;
-        // }
+        const filters: WeatherFilters = {};
+        if (!isNaN(sinceFilter.getTime())) {
+            filters.since = new Date(sinceFilter);
+        }
+        if (!isNaN(minTemperature)) {
+            filters.minTemperature = minTemperature;
+        }
+        if (!isNaN(maxTemperature)) {
+            filters.maxTemperature = maxTemperature;
+        }
 
-        // return this.weatherService.getAllWeatherData(filters, sortByDate);
-        return this.weatherService.getAllWeatherData();
+        return this.weatherService.getAllWeatherData(filters, sortByDate);
     }
 
     @Get(':id')

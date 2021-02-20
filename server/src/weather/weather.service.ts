@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { WeatherEntity } from "./models/weather.entity";
 import { CreateWeatherDto, WeatherDto } from "./models/weather.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { LessThanOrEqual, MoreThan, MoreThanOrEqual, Repository } from "typeorm";
 
 export type WeatherFilters = {
     since?: Date,
@@ -10,40 +10,30 @@ export type WeatherFilters = {
     maxTemperature?: number
 }
 
-export type SortOption = 'ascending' | 'descending';
+export type SortOption = 'ASC' | 'DESC';
 
 @Injectable()
 export class WeatherService {
     constructor(@InjectRepository(WeatherEntity) private weatherRepository: Repository<WeatherEntity>) { }
 
-    // async getAllWeatherData(filters: WeatherFilters, sortByDate: SortOption = 'ascending'): Promise<WeatherDto[]> {
-    // const query = {};
-    // if (filters.since) {
-    //     query['createdAt'] = {
-    //         '$gte': filters.since
-    //     }
-    // }
+    async getAllWeatherData(filters: WeatherFilters, sortByDate: SortOption = 'ASC'): Promise<WeatherDto[]> {
+        const query = { where: [] };
 
-    // if (typeof filters.minTemperature !== 'undefined') {
-    //     query['temperature'] = {
-    //         '$gte': filters.minTemperature
-    //     }
-    // }
+        if (filters.since) {
+            query['where'] = [{ createdAt: MoreThanOrEqual(filters.since) }];
+        }
 
-    // if (typeof filters.maxTemperature !== 'undefined') {
-    //     query['temperature'] = {
-    //         ...query['temperature'],
-    //         '$lte': filters.maxTemperature
-    //     }
-    // }
+        if (typeof filters.minTemperature !== 'undefined') {
+            query['where'][0] = { ...query['where'][0], temperature: MoreThanOrEqual(filters.minTemperature) };
+        }
 
-    // const sortOptions = {
-    //     createdAt: (sortByDate !== 'ascending' && sortByDate !== 'descending') ? 'ascending' : sortByDate
-    // }
-    // const allWeatherData = await this.weatherModel.find(query).sort(sortOptions).exec();
-    //     return allWeatherData.map(p => new WeatherDto(p));
-    async getAllWeatherData(): Promise<WeatherDto[]> {
-        const allWeatherData = await this.weatherRepository.find();
+        if (typeof filters.maxTemperature !== 'undefined') {
+            query['where'][0] = { ...query['where'][0], temperature: LessThanOrEqual(filters.maxTemperature) };
+
+        }
+        query['order'] = { createdAt: (sortByDate !== 'ASC' && sortByDate !== 'DESC') ? 'ASC' : sortByDate };
+
+        const allWeatherData = await this.weatherRepository.find(query);
         return allWeatherData.map(p => new WeatherDto(p));
     }
 
