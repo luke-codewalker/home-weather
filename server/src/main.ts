@@ -4,10 +4,12 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { apiInfo } from './models/api-info.dto';
 import * as helmet from 'helmet';
+import * as cors from 'cors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(helmet());
+  app.use(cors());
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.setGlobalPrefix('api')
