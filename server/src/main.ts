@@ -14,14 +14,16 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.setGlobalPrefix('api')
 
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle(apiInfo.title)
-    .setDescription(apiInfo.description)
-    .setVersion(apiInfo.version)
-    .build();
+  if (process.env.NODE_ENV !== 'production') {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle(apiInfo.title)
+      .setDescription(apiInfo.description)
+      .setVersion(apiInfo.version)
+      .build();
 
-  const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api/docs', app, swaggerDoc);
+    const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api/docs', app, swaggerDoc);
+  }
 
   const port = process.env.PORT || 3000;
   await app.listen(port);

@@ -6,6 +6,8 @@ COPY package*.json ./
 
 RUN npm i
 
+ENV NODE_ENV=development
+
 COPY . .
 
 FROM node:alpine as production
