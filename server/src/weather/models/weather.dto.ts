@@ -1,4 +1,4 @@
-import { IsNumber } from "class-validator";
+import { IsNumber, IsString } from "class-validator";
 import { WeatherEntity } from "./weather.entity";
 
 export class WeatherDto {
@@ -8,6 +8,7 @@ export class WeatherDto {
         this.pressure = weather.pressure;
         this.humidity = weather.humidity;
         this.createdAt = weather.createdAt;
+        this.name = weather.name;
     }
 
     id: string;
@@ -15,6 +16,7 @@ export class WeatherDto {
     pressure: number;
     humidity: number;
     createdAt: Date;
+    name: string;
 }
 
 export class CreateWeatherDto {
@@ -24,4 +26,6 @@ export class CreateWeatherDto {
     pressure: number;
     @IsNumber()
     humidity: number;
+    @IsString()
+    name: string;
 }

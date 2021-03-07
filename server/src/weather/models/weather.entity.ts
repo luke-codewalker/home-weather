@@ -13,6 +13,9 @@ export class WeatherEntity {
     @Column('numeric')
     pressure: number;
 
+    @Column()
+    name: string;
+
     @CreateDateColumn()
     createdAt: Date;
 }
