@@ -13,8 +13,10 @@ export class WeatherEntity {
     @Column('numeric')
     pressure: number;
 
-    @Column()
-    name: string;
+    @Column('varchar', {
+        nullable: true
+    })
+    name?: string;
 
     @CreateDateColumn()
     createdAt: Date;
