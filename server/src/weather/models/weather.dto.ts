@@ -9,6 +9,7 @@ export class WeatherDto {
         this.humidity = weather.humidity;
         this.createdAt = weather.createdAt;
         this.name = weather.name;
+        this.voltage = weather.voltage;
     }
 
     id: string;
@@ -17,6 +18,7 @@ export class WeatherDto {
     humidity: number;
     createdAt: Date;
     name: string;
+    voltage: number;
 }
 
 export class CreateWeatherDto {
@@ -29,4 +31,7 @@ export class CreateWeatherDto {
     @IsString()
     @IsOptional()
     name?: string;
+    @IsNumber()
+    @IsOptional()
+    voltage?: number;
 }

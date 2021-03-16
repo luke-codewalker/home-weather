@@ -18,6 +18,11 @@ export class WeatherEntity {
     })
     name?: string;
 
+    @Column('numeric', {
+        nullable: true
+    })
+    voltage?: number;
+
     @CreateDateColumn()
     createdAt: Date;
 }
