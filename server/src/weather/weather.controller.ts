@@ -45,6 +45,11 @@ export class WeatherController {
         return this.weatherService.getAllWeatherData(filters, sortByDate);
     }
 
+    @Get('latest')
+    async getLatestWeatherData() {
+        return this.weatherService.getLatestWeatherData();
+    }
+
     @Get(':id')
     async getWeatherById(@Param('id') id: string) {
         let weather: WeatherDto;

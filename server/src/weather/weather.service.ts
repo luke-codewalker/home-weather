@@ -37,6 +37,11 @@ export class WeatherService {
         return allWeatherData.map(p => new WeatherDto(p));
     }
 
+    async getLatestWeatherData() {
+        const weatherData = await this.weatherRepository.find({ order: { createdAt: 'DESC' }, take: 1 });
+        return new WeatherDto(weatherData[0]);
+    }
+
     async createNewWeather(weatherData: CreateWeatherDto) {
         const savedWeather = await this.weatherRepository.save(weatherData);
         return new WeatherDto(savedWeather);
