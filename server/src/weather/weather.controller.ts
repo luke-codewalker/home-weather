@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Overview } from './models/overview';
 import { CreateWeatherDto, WeatherDto } from './models/weather.dto';
 import { SortOption, WeatherFilters, WeatherService } from './weather.service';
 
@@ -49,6 +50,12 @@ export class WeatherController {
     async getLatestWeatherData() {
         const dataAsArray = await this.weatherService.getLatestWeatherData();
         return dataAsArray[0];
+    }
+
+    @Get('overview')
+    async getOverview() {
+        const [current, previous] = await this.weatherService.getLatestWeatherData(2);
+        return new Overview({ current, previous });
     }
 
     @Get(':id')
