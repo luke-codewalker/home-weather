@@ -47,7 +47,8 @@ export class WeatherController {
 
     @Get('latest')
     async getLatestWeatherData() {
-        return this.weatherService.getLatestWeatherData();
+        const dataAsArray = await this.weatherService.getLatestWeatherData();
+        return dataAsArray[0];
     }
 
     @Get(':id')
